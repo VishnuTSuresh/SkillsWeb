@@ -1,0 +1,6 @@
+openai==1.13.3
+mdutils==1.6.0
+Flask==3.0.2
+gunicorn==21.2.0
+gevent==24.2.1
+python-dotenv==1.0.1
