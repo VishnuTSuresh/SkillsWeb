@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Index Page{% endblock %}
+
+{% block style %}
+<style>
+    .user-message {
+        text-align: right;
+    }
+    .character-message {
+        text-align: left;
+    }
+    .message {
+        /* add a light border at bottom*/
+        border-bottom: 1px solid #e0e0e0;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row mt-2">
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text">Choose Your Character</span>
+                    <select class="form-select" id="character">
+                        {% for role in roles %}
+                        <option value="{{ loop.index }}">{{ role }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body" id="chat-history">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="75" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="User Input" id="user-input">
+                    <button class="btn btn-primary" type="button" id="send">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    {% block scripts %}
+    <script>
+        $(document).ready(function () {
+            var character = 1;
+            var chatHistory = [];
+            var chatHistoryElement = $('#chat-history');
+            var userInput = $('#user-input');
+            var sendButton = $('#send');
+            var characterSelect = $('#character');
+            // on change character, reset chat history and clear chat history element
+            characterSelect.on('change', function () {
+                character = characterSelect.val();
+                chatHistory = [];
+                chatHistoryElement.html('');
+            });
+            sendButton.on('click', onUserInput);
+            userInput.on('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    onUserInput();
+                }
+            });
+            function onUserInput() {
+                var userMessage = userInput.val();
+                chatHistory.push({
+                    role: 'User',
+                    content: userMessage
+                });
+                chatHistoryElement.append('<p class="user-message message">' + userMessage + '</p>');
+                userInput.val('');
+                // send user input to server
+                $.ajax({
+                    url: '/userinput',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        character: character,
+                        chathistory: chatHistory
+                    }),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        chatHistory.push({
+                            role: "AI",
+                            content: response.message
+                        });
+
+                        chatHistoryElement.append('<p class="character-message message">' + response.message + '</p>');
+
+                        let progress = response.progress;
+                        $('.progress-bar').css('width', progress * 10 + '%');
+                    }
+                });
+            }
+
+        });
+    </script>
+    {% endblock %}
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
+from src.roles import roles
 
 load_dotenv()
 
@@ -11,6 +12,14 @@ app = Flask(__name__)
 @app.route("/")
 def hello():
     return render_template("index.html")
+
+@app.route("/consoleme")
+def consoleme():
+    return render_template("consoleme.html", roles= roles)
+
+@app.route("/convinceme")
+def convinceme():
+    return render_template("convinceme.html")
 
 @app.route("/userinput", methods=["POST"])
 def userinput():
