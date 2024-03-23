@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Index Page{% endblock %}
+
+{% block style %}
+<style>
+    .float-right {
+        float: right
+    }
+
+    .clearfix:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 5px
+    }
+
+    .user-message {
+        text-align: right;
+    }
+
+    .character-message {
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="grid">
+    <div class="row">
+        <div class="column">
+            <div class="input-group">
+                <span class="input-group-text">Choose Your Character</span>
+                <select class="ui search dropdown" id="character">
+                    {% for role in roles %}
+                    <option value="{{ loop.index }}">{{ role }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+    </div>
+    <h4 class="ui horizontal divider header">
+        Chat History
+    </h4>
+    <div class="row">
+        <div class="column">
+            <div class="ui segment" id="chat-history">
+            </div>
+        </div>
+    </div>
+    <div class="gpt-break"></div>
+    <div class="row">
+        <div class="column">
+            <div class="ui teal progress" id="progress-bar">
+                <div class="bar"></div>
+              </div>
+        </div>
+    </div>
+    <div class="gpt-break"></div>
+    <div class="row">
+        <div class="column">
+            <div class="ui fluid action input">
+                <input type="text" placeholder="User Input..." id="user-input">
+                <div class="ui button teal" id="send">Send</div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        var character = 1;
+        var chatHistory = [];
+        var chatHistoryElement = $('#chat-history');
+        var userInput = $('#user-input');
+        var sendButton = $('#send');
+        var characterSelect = $('#character');
+        // on change character, reset chat history and clear chat history element
+        characterSelect.on('change', function () {
+            character = characterSelect.val();
+            chatHistory = [];
+            chatHistoryElement.html('');
+            $('#progress-bar').progress({
+                percent: 0
+            });
+        });
+        sendButton.on('click', onUserInput);
+        userInput.on('keypress', function (e) {
+            if (e.key === 'Enter') {
+                onUserInput();
+            }
+        });
+        function onUserInput() {
+            var userMessage = userInput.val();
+            chatHistory.push({
+                role: 'User',
+                content: userMessage
+            });
+            chatHistoryElement.append('<div class="user-message float-right ui label teal">' + userMessage + '</div><div class="clearfix" />');
+            userInput.val('');
+            // send user input to server
+            $.ajax({
+                url: '/userinput',
+                method: 'POST',
+                data: JSON.stringify({
+                    character: character,
+                    chathistory: chatHistory
+                }),
+                contentType: 'application/json',
+                success: function (response) {
+                    chatHistory.push({
+                        role: "AI",
+                        content: response.message
+                    });
+
+                    chatHistoryElement.append('<div class="character-message ui label grey">' + response.message + '</div><div class="clearfix" />');
+
+                    let progress = response.progress;
+                    $('#progress-bar').progress({
+                        percent: progress*10
+                    });
+                }
+            });
+        }
+
+    });
+</script>
+{% endblock %}
+</body>
+
+</html>
