@@ -5,7 +5,8 @@ from src.roles import roles
 load_dotenv()
 
 from src.llmtoolkit import LLMToolkit
-from src.chat_completion import rate_consolation
+from src.convince_me_toolkit import ConvinceMeToolkit
+from src.chat_completion import rate_consolation, rate_convincing
 
 app = Flask(__name__)
 
@@ -33,6 +34,20 @@ def userinput():
     return jsonify({
         "message":response,
         "progress": rating
+    })
+
+@app.route("/convinceme_input", methods=["POST"])
+def convinceme_input():
+    # get the body as json
+    data = request.get_json()
+    chathistory = data["chathistory"]
+    llm = ConvinceMeToolkit()
+    response = llm.user_input(data["chathistory"])
+    rating, convinced = rate_convincing(chathistory)
+    return jsonify({
+        "message":response,
+        "progress": rating,
+        "convinced": convinced
     })
 
 if __name__ == '__main__':
