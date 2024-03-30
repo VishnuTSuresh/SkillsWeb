@@ -82,7 +82,7 @@ def rate_convincing(chat_history):
             "type": "function",
             "function": {
                 "name": "get_convincing_rating",
-                "description": "Rate how well the user is convincing you",
+                "description": "Rate how well I am convincing you to sell me the coffee",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -92,7 +92,7 @@ def rate_convincing(chat_history):
                         },
                         "convinced": {
                             "type": "boolean",
-                            "description": "Whether you are convinced or not",
+                            "description": "Whether you are convinced or not to sell me the coffee for $4",
                         }
                     },
                     "required": ["rating", "convinced"],
