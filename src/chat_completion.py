@@ -53,7 +53,7 @@ def rate_consolation(character, chat_history):
 
 def complete_text(input_text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-0125",
         temperature=0,
         messages=[
             {

@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from src.roles import roles
+from src.simple_characters import characters
 
 load_dotenv()
 
 from src.llmtoolkit import LLMToolkit
 from src.convince_me_toolkit import ConvinceMeToolkit
 from src.imaginarium_toolkit import ImaginariumToolkit
-from src.poet import PoetToolkit
+from src.character_toolkit import CharacterToolkit
 from src.chat_completion import rate_consolation, rate_convincing
 
 app = Flask(__name__)
@@ -67,15 +68,18 @@ def imaginarium_input():
         "message":response,
     })
 
-@app.route("/poet")
-def poet():
-    return render_template("poet.html")
+@app.route("/character/<character>")
+def character(character):
+    return render_template(
+        "character.html",
+        character = characters[character]
+    )
 
-@app.route("/poet_input", methods=["POST"])
-def poet_input():
+@app.route("/character_input/<character>", methods=["POST"])
+def character_input(character):
     data = request.get_json()
     chathistory = data["chathistory"]
-    poet_toolkit = PoetToolkit()
+    poet_toolkit = CharacterToolkit(characters[character]["role"])
     response = poet_toolkit.user_input(chathistory)
     return jsonify({
         "message":response,

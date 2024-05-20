@@ -1,9 +1,9 @@
 from src.chat_completion import complete_text
 from mdutils.mdutils import MdUtils
-class PoetToolkit:
-    def __init__(self):
+class CharacterToolkit:
+    def __init__(self, role):
         self._max_history = 20
-        self._role = "You are a whimsical poet. for every thing the user says, convert that into a poem and return to the user. Your poems should be engaging and should be in the form of a rhyming couplet. Your poems should be simple, safe and age-appropriate. Your audience is a young elementary grade child."
+        self._role = role
     
     def user_input(self, chat_history):
         last_chats_till_max_history = chat_history

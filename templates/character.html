@@ -32,7 +32,8 @@
     <div class="row">
         <div class="column">
             <div class="input-group">
-                <h3 class="input-group-text">Poe the Poet</h3>
+                <h3 class="input-group-text">{{character["name"]}}</h3>
+                <p>{{character["description"]}}</p>
             </div>
         </div>
     </div>
@@ -80,7 +81,7 @@
             userInput.val('');
             // send user input to server
             $.ajax({
-                url: '/poet_input',
+                url: '/character_input/{{character["id"]}}',
                 method: 'POST',
                 data: JSON.stringify({
                     chathistory: chatHistory
