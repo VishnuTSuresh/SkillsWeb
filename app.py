@@ -7,6 +7,7 @@ load_dotenv()
 from src.llmtoolkit import LLMToolkit
 from src.convince_me_toolkit import ConvinceMeToolkit
 from src.imaginarium_toolkit import ImaginariumToolkit
+from src.poet import PoetToolkit
 from src.chat_completion import rate_consolation, rate_convincing
 
 app = Flask(__name__)
@@ -62,6 +63,20 @@ def imaginarium_input():
     world = data["world"]
     imaginarium_toolkit = ImaginariumToolkit(world)
     response = imaginarium_toolkit.user_input(chathistory)
+    return jsonify({
+        "message":response,
+    })
+
+@app.route("/poet")
+def poet():
+    return render_template("poet.html")
+
+@app.route("/poet_input", methods=["POST"])
+def poet_input():
+    data = request.get_json()
+    chathistory = data["chathistory"]
+    poet_toolkit = PoetToolkit()
+    response = poet_toolkit.user_input(chathistory)
     return jsonify({
         "message":response,
     })
