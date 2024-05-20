@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Index Page{% endblock %}
+
+{% block style %}
+<style>
+    .float-right {
+        float: right
+    }
+
+    .clearfix:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 5px
+    }
+
+    .user-message {
+        text-align: right;
+    }
+
+    .character-message {
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="grid">
+    <div class="row">
+        <div class="column">
+            <div class="input-group">
+                <h3 class="input-group-text">Welcome to the Imaginarium of Endless Adventures</h3>
+                <p>Welcome to the Imaginarium of Endless Adventures! Step into a realm where your imagination knows no bounds. Choose any world you desire—enchanted forests, futuristic cities, or ancient ruins—and embark on thrilling quests and epic tales. Embrace the magic, and let your adventure begin!</p>
+                <p>Enter the world where you would like your adventures to take place:</p>
+                <div class="ui input">
+                   <input type="text" id="world" placeholder="World">
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <h4 class="ui horizontal divider header">
+        Chat History
+    </h4>
+    <div class="row">
+        <div class="column">
+            <div class="ui segment" id="chat-history">
+            </div>
+        </div>
+    </div>
+    <div class="gpt-break"></div>
+    <div class="row">
+        <div class="column">
+            <div class="ui fluid action input">
+                <input type="text" placeholder="User Input..." id="user-input">
+                <div class="ui button teal" id="send">Send</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        var world = "";
+        var chatHistory = [];
+        var chatHistoryElement = $('#chat-history');
+        var userInput = $('#user-input');
+        var sendButton = $('#send');
+
+        var worldSelect = $('#world');
+        worldSelect.on('input', function () {
+            world = worldSelect.val();
+            chatHistory = [];
+            chatHistoryElement.html('');
+        });
+
+        sendButton.on('click', onUserInput);
+        userInput.on('keypress', function (e) {
+            if (e.key === 'Enter') {
+                onUserInput();
+            }
+        });
+        function onUserInput() {
+            var userMessage = userInput.val();
+            chatHistory.push({
+                role: 'User',
+                content: userMessage
+            });
+            chatHistoryElement.append('<div class="user-message float-right ui label teal">' + userMessage + '</div><div class="clearfix" />');
+            userInput.val('');
+            // send user input to server
+            $.ajax({
+                url: '/imaginarium_input',
+                method: 'POST',
+                data: JSON.stringify({
+                    world: world,
+                    chathistory: chatHistory
+                }),
+                contentType: 'application/json',
+                success: function (response) {
+                    chatHistory.push({
+                        role: "AI",
+                        content: response.message
+                    });
+
+                    chatHistoryElement.append('<div class="character-message ui label grey">' + response.message + '</div><div class="clearfix" />');
+                }
+            });
+        }
+
+    });
+</script>
+{% endblock %}
+</body>
+
+</html>

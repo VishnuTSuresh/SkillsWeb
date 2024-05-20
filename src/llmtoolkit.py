@@ -11,7 +11,7 @@ class LLMToolkit:
         content_md.new_header(level=1, title="Your Role")
         content_md.new_paragraph(self._role)
         content_md.new_header(level=1, title="Your Instructions")
-        content_md.new_paragraph("This is the start of the conversation, you will give tell the user whats bothering you and wait for the input from the user. ")
+        content_md.new_paragraph("This is the start of the conversation, you will tell the user whats bothering you and wait for the input from the user. ")
         content_md.new_paragraph("AI: ")
         content = content_md.get_md_text()
         response = complete_text(content)

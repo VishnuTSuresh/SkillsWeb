@@ -6,6 +6,7 @@ load_dotenv()
 
 from src.llmtoolkit import LLMToolkit
 from src.convince_me_toolkit import ConvinceMeToolkit
+from src.imaginarium_toolkit import ImaginariumToolkit
 from src.chat_completion import rate_consolation, rate_convincing
 
 app = Flask(__name__)
@@ -17,10 +18,6 @@ def hello():
 @app.route("/consoleme")
 def consoleme():
     return render_template("consoleme.html", roles= roles)
-
-@app.route("/convinceme")
-def convinceme():
-    return render_template("convinceme.html")
 
 @app.route("/userinput", methods=["POST"])
 def userinput():
@@ -36,6 +33,10 @@ def userinput():
         "progress": rating
     })
 
+@app.route("/convinceme")
+def convinceme():
+    return render_template("convinceme.html")
+
 @app.route("/convinceme_input", methods=["POST"])
 def convinceme_input():
     # get the body as json
@@ -48,6 +49,21 @@ def convinceme_input():
         "message":response,
         "progress": rating,
         "convinced": convinced
+    })
+
+@app.route("/imaginarium")
+def imaginarium():
+    return render_template("imaginarium.html")
+
+@app.route("/imaginarium_input", methods=["POST"])
+def imaginarium_input():
+    data = request.get_json()
+    chathistory = data["chathistory"]
+    world = data["world"]
+    imaginarium_toolkit = ImaginariumToolkit(world)
+    response = imaginarium_toolkit.user_input(chathistory)
+    return jsonify({
+        "message":response,
     })
 
 if __name__ == '__main__':
